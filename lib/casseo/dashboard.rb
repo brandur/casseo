@@ -130,16 +130,18 @@ module Casseo
         data_points = @data.detect { |d| d["target"] == conf[:metric] }
         data_points = data_points ? data_points["datapoints"].dup : []
 
-        # smaller range high resolution requests will have nil values
-        data_points.reject! { |p| p[0] == nil }
-
         # show left to right latest to oldest
         data_points.reverse!
 
-        max = data_points.max { |p1, p2| p1[0] <=> p2[0] }
+        max = data_points.select { |p| p[0] != nil }.
+          max { |p1, p2| p1[0] <=> p2[0] }
         max = max ? max[0] : nil
 
-        latest = data_points.count > 0 ? data_points[0][0] : 0.0
+        # keep everything under a very small threshold at 0 bars
+        max = 0.0 if max && max < 0.01
+
+        latest = data_points.detect { |p| p[0] != nil }
+        latest = latest ? latest[0] : 0.0
 
         unit = conf[:unit] || " "
         str = "%-#{@longest_display}s %8.1f%s " %
@@ -152,6 +154,7 @@ module Casseo
             next if i % 2 == 0 unless Config.compressed_chart
             index = ((i.to_f / num_samples.to_f) * data_points.count.to_f).to_i - 1
             sample = data_points[index][0]
+            sample = 0.0 unless sample
 
             index = (sample / max * CHART_CHARS.count).to_i - 1
             chart += CHART_CHARS[index]
