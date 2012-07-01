@@ -10,7 +10,7 @@ module Casseo
       @confs = []
       @data = nil
       @page = 0
-      @period = 5 # minutes
+      @period = Config.period_default # minutes
     end
 
     def blank

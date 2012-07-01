@@ -24,6 +24,11 @@ module Casseo
       config(:interval) || 2.0
     end
 
+    # minutes
+    def period_default
+      config(:period_default) || 5
+    end
+
     def required
       [ Casseo::Config.graphite_auth,
         Casseo::Config.graphite_url ]

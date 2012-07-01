@@ -27,6 +27,7 @@ Other allowed configuration options are:
 * `compressed_chart:` whether to include a space between chart symbols
 * `dashboard_default:` name of the dashboard to load if none is specified
 * `interval:` Graphite update interval in seconds
+* `period_default:` default period of data to show
 
 Dashboards
 ----------
