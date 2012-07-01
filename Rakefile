@@ -1,16 +1,10 @@
 task :standalone do
   skeleton = File.read("./bin/casseo")
 
-  # same require order as lib/casseo.rb
-  source_files = [
-    "./lib/casseo/config",
-    "./lib/casseo/index",
-    "./lib/casseo/dashboard",
-    "./lib/casseo/runner",
-    "./lib/casseo/version",
-  ]
+  source_files = File.read("./lib/casseo.rb").
+    scan(/require_relative "(.*)"/).map { |f| "./lib/#{f.first}.rb" }
 
-  source = source_files.map { |f| File.read("#{f}.rb") }.join("\n")
+  source = source_files.map { |f| File.read(f) }.join("\n")
   source = skeleton.gsub(
     /# @@STANDALONE_START@@.*# @@STANDALONE_END@@\n\n/m, source)
 
