@@ -1,7 +1,7 @@
 Casseo
 ======
 
-A Graphite dashboard viewable without ever leaving the command line. Configuration and concept very similar to [Tasseo](tasseo).
+A Graphite dashboard viewable without ever leaving the command line. Configuration and concept very similar to [Tasseo](https://github.com/obfuscurity/tasseo).
 
 Install via Rubygems:
 
@@ -77,5 +77,3 @@ For now, there are no options on key bindings. Here's what you get:
 * `3` 3 hour range
 * `4` 24 hour range
 * `5` 7 day range
-
-[tasseo]: https://github.com/obfuscurity/tasseo
