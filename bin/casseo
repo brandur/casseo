@@ -38,8 +38,7 @@ begin
   Casseo::Config.required
 
   if ARGV.count > 0 && File.exists?(File.expand_path(ARGV.first))
-    dashboard = eval(File.read(ARGV.first))
-    dashboard.run
+    eval(File.read(ARGV.first)).run
   elsif ARGV.count > 0 && ["-l", "--list"].include?(ARGV.first)
     $exit_message = Casseo::Dashboard.index.sort.join("\n")
   elsif ARGV.first
