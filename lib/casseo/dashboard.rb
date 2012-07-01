@@ -149,12 +149,13 @@ module Casseo
         if max && max > 0
           num_samples = Curses.cols - str.length
           (1..num_samples).each do |i|
+            next if i % 2 == 0 unless Config.compressed_chart
             index = ((i.to_f / num_samples.to_f) * data_points.count.to_f).to_i - 1
             sample = data_points[index][0]
 
             index = (sample / max * CHART_CHARS.count).to_i - 1
             chart += CHART_CHARS[index]
-            #chart += " " unless Config.compressed_chart
+            chart += " " unless Config.compressed_chart
           end
         end
 
