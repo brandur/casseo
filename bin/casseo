@@ -9,46 +9,4 @@ require "uri"
 
 require_relative "../lib/casseo"
 
-# load all user dashboards
-dir = "#{File.expand_path("~")}/.casseo/dashboards"
-if File.exists?(dir)
-  # clever hack to get symlinks working properly
-  Dir["#{dir}/**{,/*/**}/*.rb"].each do |d|
-    require d
-  end
-end
-
-$exit_message = nil
-
-["TERM", "INT"].each do |s|
-  Signal.trap(s) do
-    $exit_message = "Caught deadly signal"
-    Kernel.exit(0)
-  end
-end
-
-begin
-  Curses.cbreak      # no need for a newline to get type chars
-  Curses.curs_set(1) # invisible
-  Curses.noecho      # don't echo character on a getch
-
-  Curses.init_screen
-
-  # fail fast on missing required config
-  Casseo::Config.required
-
-  if ARGV.count > 0 && File.exists?(File.expand_path(ARGV.first))
-    eval(File.read(ARGV.first)).run
-  elsif ARGV.count > 0 && ["-l", "--list"].include?(ARGV.first)
-    $exit_message = Casseo::Dashboard.index.sort.join("\n")
-  elsif ARGV.first
-    Casseo::Dashboard.run(ARGV.first.to_sym)
-  else
-    Casseo::Dashboard.run(Casseo::Config.dashboard_default)
-  end
-rescue Casseo::ConfigError, Casseo::DashboardNotFound => e
-  $exit_message = e.message
-ensure
-  Curses.close_screen
-  puts $exit_message if $exit_message
-end
+Casseo::Runner.execute(ARGV)
