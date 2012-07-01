@@ -7,7 +7,7 @@ require "net/https"
 require "timeout"
 require "uri"
 
-require "./lib/casseo"
+require_relative "../lib/casseo"
 
 # load all user dashboards
 dir = "#{File.expand_path("~")}/.casseo/dashboards"
