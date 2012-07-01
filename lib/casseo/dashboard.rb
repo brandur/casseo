@@ -128,34 +128,37 @@ module Casseo
         next unless i >= @page * Curses.lines && i < (@page + 1) * Curses.lines
 
         data_points = @data.detect { |d| d["target"] == conf[:metric] }
-        data_points = data_points ? data_points["datapoints"] : []
+        data_points = data_points ? data_points["datapoints"].dup : []
+
+        # smaller range high resolution requests will have nil values
+        data_points.reject! { |p| p[0] == nil }
 
         # show left to right latest to oldest
         data_points.reverse!
 
-        max = data_points.
-          select { |p| p[0] != nil }.
-          max { |p1, p2| p1[0] <=> p2[0] }
+        max = data_points.max { |p1, p2| p1[0] <=> p2[0] }
         max = max ? max[0] : nil
 
-        latest = data_points.detect { |p| p[0] != nil }
-        latest = latest ? latest[0] : 0.0
+        latest = data_points.count > 0 ? data_points[0][0] : 0.0
 
-        current = nil
+        unit = conf[:unit] || " "
+        str = "%-#{@longest_display}s %8.1f%s " %
+          [conf[:display] || conf[:metric], latest, unit]
+
         chart = ""
         if max && max > 0
-          data_points.each do |p|
-            current = p[0] || current
-            next unless current
-            index = (current.to_f / max * CHART_CHARS.count).to_i - 1
+          num_samples = Curses.cols - str.length
+          (1..num_samples).each do |i|
+            index = ((i.to_f / num_samples.to_f) * data_points.count.to_f).to_i - 1
+            sample = data_points[index][0]
+
+            index = (sample / max * CHART_CHARS.count).to_i - 1
             chart += CHART_CHARS[index]
-            chart += " " unless Config.compressed_chart
+            #chart += " " unless Config.compressed_chart
           end
         end
 
-        unit = conf[:unit] || " "
-        str = "%-#{@longest_display}s %8.1f%s %s" %
-          [conf[:display] || conf[:metric], latest, unit, chart]
+        str += chart
         str = str[0...Curses.cols]
         Curses.setpos(i % Curses.lines, 0)
         Curses.addstr(str)
