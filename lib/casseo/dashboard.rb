@@ -9,6 +9,7 @@ module Casseo
     def initialize
       @confs = []
       @data = nil
+      @decimal_precision = Config.decimal_precision
       @page = 0
       @period = Config.period_default # minutes
       @show_max = false
@@ -85,15 +86,18 @@ module Casseo
 
     def handle_key_presses
       loop do
-        new_page     = nil
-        new_period   = nil
-        new_show_max = nil
+        new_decimal_precision = nil
+        new_page              = nil
+        new_period            = nil
+        new_show_max          = nil
 
         case Curses.getch
         when Curses::KEY_RESIZE then show
         when ?j then new_page = clamp(@page + 1, 0, num_pages)
         when ?k then new_page = clamp(@page - 1, 0, num_pages)
         when ?m then new_show_max = !@show_max
+        when ?p then new_decimal_precision = @decimal_precision == 3 ?
+          Config.decimal_precision : 3
         when ?q then Kernel.exit(0)
         when ?1 then new_period = 5
         when ?2 then new_period = 60
@@ -110,6 +114,12 @@ module Casseo
 
         if new_show_max != nil
           @show_max = new_show_max
+          Curses.clear
+          show
+        end
+
+        if new_decimal_precision && new_decimal_precision != @decimal_precision
+          @decimal_precision = new_decimal_precision
           Curses.clear
           show
         end
@@ -153,9 +163,11 @@ module Casseo
         latest = latest ? latest[0] : 0.0
 
         unit = conf[:unit] || " "
-        str = "%-#{@longest_display}s %8.1f%s " %
+        float_width = 7 + @decimal_precision
+        str = "%-#{@longest_display}s %#{float_width}.#{@decimal_precision}f%s " %
           [conf[:display] || conf[:metric], latest, unit]
-        str += "%8.1f%s " % [max || 0.0, unit] if @show_max
+        str += "%#{float_width}.#{@decimal_precision}f%s " %
+          [max || 0.0, unit] if @show_max
 
         chart = ""
         if max && max > 0

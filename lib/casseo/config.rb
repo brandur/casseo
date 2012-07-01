@@ -4,11 +4,16 @@ module Casseo
 
     # whether an extra space is inserted between chart characters
     def compressed_chart
-      config(:compressed_chart)
+      !!config(:compressed_chart)
     end
 
     def dashboard_default
       config(:dashboard_default) || :home
+    end
+
+    # show extra decimal precision
+    def decimal_precision
+      config(:decimal_precision) || 1
     end
 
     def graphite_auth
