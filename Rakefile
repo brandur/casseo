@@ -1,9 +1,10 @@
 task :standalone do
-  skeleton = File.read("./bin/casseo")
-
+  # lib/casseo.rb knows the correct load order
   source_files = File.read("./lib/casseo.rb").
     scan(/require_relative "(.*)"/).map { |f| "./lib/#{f.first}.rb" }
 
+  # use bin/casseo as an executable template
+  skeleton = File.read("./bin/casseo")
   source = source_files.map { |f| File.read(f) }.join("\n")
   source = skeleton.gsub(
     /# @@STANDALONE_START@@.*# @@STANDALONE_END@@\n\n/m, source)
