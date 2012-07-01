@@ -24,18 +24,18 @@ Casseo expects to be able to find your Graphite credentials at `~/.casseorc`:
 
 Other allowed configuration options are:
 
-    * `compressed_chart:` whether to include a space between chart symbols
-    * `dashboard_default:` name of the dashboard to load if none is specified
-    * `interval:` Graphite update interval in seconds
+* `compressed_chart:` whether to include a space between chart symbols
+* `dashboard_default:` name of the dashboard to load if none is specified
+* `interval:` Graphite update interval in seconds
 
 Dashboards
 ----------
 
-Dashboards are configured via simple Ruby in a manner reminiscent of Tasseo. All `*.rb` files in `~/.casseo/dashboards` or in any of its subdirectories are loaded automatically at startup. Dashboards are assigned names so that they can be referenced and opened like so:
+Dashboards are configured via simple Ruby in a manner reminiscent of Tasseo. All `*.rb` files in `~/.casseo/dashboards` or in any of its subdirectories are loaded automatically. Dashboards are assigned names so that they can be referenced and opened like so:
 
     casseo home
 
-An example dashboard that can be saved to `~/.casseo/dashboards/home.rb`:
+An example dashboard (save to `~/.casseo/dashboards/home.rb`):
 
 ``` ruby
 Casseo::Dashboard.define(:api) do |d|
@@ -65,13 +65,13 @@ Key Bindings
 
 For now, there are no options on key bindings. Here's what you get:
 
-    * `j` page down
-    * `k` page up
-    * `q` quit
-    * `1` 5 minute range
-    * `2` 60 minute range
-    * `3` 3 hour range
-    * `4` 24 hour range
-    * `5` 7 day range
+* `j` page down
+* `k` page up
+* `q` quit
+* `1` 5 minute range
+* `2` 60 minute range
+* `3` 3 hour range
+* `4` 24 hour range
+* `5` 7 day range
 
 [tasseo]: https://github.com/obfuscurity/tasseo
