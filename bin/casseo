@@ -7,6 +7,10 @@ require "net/https"
 require "timeout"
 require "uri"
 
+# @@STANDALONE_START@@
+
 require_relative "../lib/casseo"
+
+# @@STANDALONE_END@@
 
 Casseo::Runner.execute(ARGV)
