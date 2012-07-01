@@ -8,6 +8,7 @@ module Casseo
 
     def initialize
       @confs = []
+      @compressed_chart = Config.compressed_chart
       @data = nil
       @decimal_precision = Config.decimal_precision
       @page = 0
@@ -86,6 +87,7 @@ module Casseo
 
     def handle_key_presses
       loop do
+        new_compressed_chart  = nil
         new_decimal_precision = nil
         new_page              = nil
         new_period            = nil
@@ -93,6 +95,7 @@ module Casseo
 
         case Curses.getch
         when Curses::KEY_RESIZE then show
+        when ?c then new_compressed_chart = !@compressed_chart
         when ?j then new_page = clamp(@page + 1, 0, num_pages)
         when ?k then new_page = clamp(@page - 1, 0, num_pages)
         when ?m then new_show_max = !@show_max
@@ -104,6 +107,12 @@ module Casseo
         when ?3 then new_period = 60 * 3
         when ?4 then new_period = 60 * 24
         when ?5 then new_period = 60 * 24 * 7
+        end
+
+        if new_compressed_chart != nil
+          @compressed_chart = new_compressed_chart
+          Curses.clear
+          show
         end
 
         if new_page && new_page != @page
@@ -173,14 +182,14 @@ module Casseo
         if max && max > 0
           num_samples = Curses.cols - str.length
           (1..num_samples).each do |i|
-            next if i % 2 == 0 unless Config.compressed_chart
+            next if i % 2 == 0 unless @compressed_chart
             index = ((i.to_f / num_samples.to_f) * data_points.count.to_f).to_i - 1
             sample = data_points[index][0]
             sample = 0.0 unless sample
 
             index = (sample / max * CHART_CHARS.count).to_i - 1
             chart += CHART_CHARS[index]
-            chart += " " unless Config.compressed_chart
+            chart += " " unless @compressed_chart
           end
         end
 

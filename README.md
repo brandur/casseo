@@ -24,7 +24,7 @@ Casseo expects to be able to find your Graphite credentials at `~/.casseorc`:
 
 Other allowed configuration options are:
 
-* `compressed_chart:` whether to include a space between chart symbols (default: false)
+* `compressed_chart:` whether to include a space between chart symbols (default: false); see also `c` shortcut
 * `dashboard_default:` name of the dashboard to load if none is specified (default: home)
 * `decimal_precision:` floating point precision to show (default: 1); see also `p` shortcut
 * `interval:` Graphite update interval in seconds (default: 2)
@@ -67,9 +67,10 @@ Key Bindings
 
 For now, there are no options on key bindings. Here's what you get:
 
+* `c` toggle compressed chart
 * `j` page down
 * `k` page up
-* `m` show/hide max value column
+* `m` toggle max value column
 * `p` show more floating point precision
 * `q` quit
 * `1` 5 minute range
