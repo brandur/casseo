@@ -12,7 +12,7 @@ Or if you're really concerned about Rubygems' speed, clone the reposistory and c
     git clone https://github.com/brandur/casseo.git
     cd casseo
     rake standalone
-    mv casseo ~/bin/casseo
+    mv casseo ~/bin/
 
 Configuration
 -------------
@@ -24,10 +24,11 @@ Casseo expects to be able to find your Graphite credentials at `~/.casseorc`:
 
 Other allowed configuration options are:
 
-* `compressed_chart:` whether to include a space between chart symbols
-* `dashboard_default:` name of the dashboard to load if none is specified
-* `interval:` Graphite update interval in seconds
-* `period_default:` default period of data to show
+* `compressed_chart:` whether to include a space between chart symbols (default: false)
+* `dashboard_default:` name of the dashboard to load if none is specified (default: home)
+* `decimal_precision:` floating point precision to show (default: 1); see also `p` shortcut
+* `interval:` Graphite update interval in seconds (default: 2)
+* `period_default:` default period of data to show (default: 5 minutes)
 
 Dashboards
 ----------
@@ -68,6 +69,8 @@ For now, there are no options on key bindings. Here's what you get:
 
 * `j` page down
 * `k` page up
+* `m` show/hide max value column
+* `p` show more floating point precision
 * `q` quit
 * `1` 5 minute range
 * `2` 60 minute range
