@@ -6,6 +6,7 @@ module Casseo
       dashboard = Dashboard.new
       yield(dashboard)
       @@index[name] = dashboard
+      dashboard
     end
 
     def index
