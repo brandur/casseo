@@ -11,6 +11,7 @@ module Casseo
       @data = nil
       @page = 0
       @period = Config.period_default # minutes
+      @show_max = false
     end
 
     def blank
@@ -84,13 +85,15 @@ module Casseo
 
     def handle_key_presses
       loop do
-        new_page   = nil
-        new_period = nil
+        new_page     = nil
+        new_period   = nil
+        new_show_max = nil
 
         case Curses.getch
         when Curses::KEY_RESIZE then show
         when ?j then new_page = clamp(@page + 1, 0, num_pages)
         when ?k then new_page = clamp(@page - 1, 0, num_pages)
+        when ?m then new_show_max = !@show_max
         when ?q then Kernel.exit(0)
         when ?1 then new_period = 5
         when ?2 then new_period = 60
@@ -101,6 +104,12 @@ module Casseo
 
         if new_page && new_page != @page
           @page = new_page
+          Curses.clear
+          show
+        end
+
+        if new_show_max != nil
+          @show_max = new_show_max
           Curses.clear
           show
         end
@@ -146,6 +155,7 @@ module Casseo
         unit = conf[:unit] || " "
         str = "%-#{@longest_display}s %8.1f%s " %
           [conf[:display] || conf[:metric], latest, unit]
+        str += "%8.1f%s " % [max || 0.0, unit] if @show_max
 
         chart = ""
         if max && max > 0
