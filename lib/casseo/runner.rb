@@ -17,7 +17,7 @@ module Casseo
 
       Curses.init_screen
 
-      # fail fast on missing required config
+      # fail fast on missing config
       Config.required
 
       load_dashboards

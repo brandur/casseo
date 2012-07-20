@@ -6,11 +6,14 @@ module Casseo
 
     extend Index
 
-    def initialize
+    def initialize(name="")
+      init_colors
+
       @confs = []
       @compressed_chart = Config.compressed_chart
       @data = nil
       @decimal_precision = Config.decimal_precision
+      @name = name
       @page = 0
       @period = Config.period_default # minutes
       @show_max = false
@@ -27,6 +30,7 @@ module Casseo
     def run
       @longest_display = @confs.compact.
         map { |c| c[:display] || c[:metric] }.map { |c| c.length }.max
+      @num_metrics = @confs.compact.count
 
       # no data yet, but force drawing of stats to the screen
       show(true)
@@ -56,6 +60,12 @@ module Casseo
 
     private
 
+    # color pairs
+    NORMAL    = 0
+    WARNING   = 1
+    CRITICAL  = 2
+    STATUS    = 3
+
     def clamp(n, min, max)
       if n < min
         min
@@ -69,7 +79,8 @@ module Casseo
     def fetch(suppress_errors=true)
       metrics = @confs.compact.map { |c| c[:metric] }
       targets = metrics.map { |m| "target=#{URI.encode(m)}" }.join("&")
-      uri = URI.parse("#{Config.graphite_url}/render/?#{targets}&from=-#{@period}minutes&format=json")
+      uri = URI.parse("#{Config.graphite_url}/render/?#{targets}&" +
+        "from=-#{@period}minutes&format=json")
 
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
@@ -140,8 +151,22 @@ module Casseo
       end
     end
 
+    def init_colors
+      Curses.start_color
+      Curses.use_default_colors
+
+      Curses.init_pair(1, Curses::COLOR_YELLOW, -1)
+      Curses.init_pair(2, Curses::COLOR_RED,    -1)
+      Curses.init_pair(3, Curses::COLOR_GREEN,  Curses::COLOR_BLUE)
+    end
+
+    def num_lines
+      # -1 for the status line
+      Curses.lines - 1
+    end
+
     def num_pages
-      (@confs.count / Curses.lines).ceil
+      (@confs.count / num_lines).ceil
     end
 
     def show(force_draw=false)
@@ -153,7 +178,7 @@ module Casseo
 
       @confs.each_with_index do |conf, i|
         next unless conf
-        next unless i >= @page * Curses.lines && i < (@page + 1) * Curses.lines
+        next unless i >= @page * num_lines && i < (@page + 1) * num_lines
 
         data_points = @data.detect { |d| d["target"] == conf[:metric] }
         data_points = data_points ? data_points["datapoints"].dup : []
@@ -195,10 +220,36 @@ module Casseo
 
         str += chart
         str = str[0...Curses.cols]
-        Curses.setpos(i % Curses.lines, 0)
+
+        color_pair = if conf[:critical] && latest >= conf[:critical]
+          CRITICAL
+        elsif conf[:warning] && latest >= conf[:warning]
+          WARNING
+        else
+          NORMAL
+        end
+
+        Curses.setpos(i % num_lines, 0)
+        Curses.attron(Curses::color_pair(color_pair) | Curses::A_NORMAL) do
+          Curses.addstr(str)
+        end
+      end
+
+      show_status
+      Curses.refresh
+    end
+
+    def show_status
+      Curses.setpos(num_lines, 0)
+      Curses.attron(Curses::color_pair(STATUS) | Curses::A_NORMAL) do
+        str = "Casseo: =#{@name}   (#{@period}m)    " +
+          "[Metrics:#{@num_metrics} Page:#{@page}/#{num_pages} " +
+          "Interval:#{Config.interval.to_i}s]"
+
+        # pad until the end of the line so we get the background
+        str += " " * (Curses.cols - str.length)
         Curses.addstr(str)
       end
-      Curses.refresh
     end
   end
 end

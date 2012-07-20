@@ -3,7 +3,7 @@ module Casseo
     @@index = {}
 
     def define(name)
-      dashboard = Dashboard.new
+      dashboard = Dashboard.new(name)
       yield(dashboard)
       @@index[name] = dashboard
       dashboard
