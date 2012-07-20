@@ -239,11 +239,20 @@ module Casseo
       Curses.refresh
     end
 
+    def format_period(seconds)
+      case true
+      when seconds < 60    then "#{seconds}s"
+      when seconds < 3600  then "#{seconds / 60}m"
+      when seconds < 86400 then "#{seconds / 3600}h"
+      else "#{seconds / 86400}d"
+      end
+    end
+
     def show_status
       Curses.setpos(num_lines, 0)
       Curses.attron(Curses::color_pair(STATUS) | Curses::A_NORMAL) do
-        str = "Casseo: =%s   (%sm)   [Metrics:%s Interval: %ss]" %
-          [@name, @period, @num_metrics, Config.interval.to_i]
+        str = "Casseo: =%s   (%s)   [Metrics:%s Interval:%ss]" %
+          [@name, format_period(@period * 60), @num_metrics, Config.interval.to_i]
         page_str = "--- %s/%s ---" % [@page, num_pages]
 
         # right align the page number
