@@ -251,7 +251,7 @@ module Casseo
     def show_status
       Curses.setpos(num_lines, 0)
       Curses.attron(Curses::color_pair(STATUS) | Curses::A_NORMAL) do
-        str = "Casseo: =%s   (%s)   [Metrics:%s Interval:%ss]" %
+        str = "casseo: =%s   (%s)   [metrics:%s interval:%ss]" %
           [@name, format_period(@period * 60), @num_metrics, Config.interval.to_i]
         page_str = "--- %s/%s ---" % [@page, num_pages]
 
