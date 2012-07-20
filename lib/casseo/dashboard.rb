@@ -242,12 +242,13 @@ module Casseo
     def show_status
       Curses.setpos(num_lines, 0)
       Curses.attron(Curses::color_pair(STATUS) | Curses::A_NORMAL) do
-        str = "Casseo: =#{@name}   (#{@period}m)    " +
-          "[Metrics:#{@num_metrics} Page:#{@page}/#{num_pages} " +
-          "Interval:#{Config.interval.to_i}s]"
+        str = "Casseo: =%s   (%sm)   [Metrics:%s Interval: %ss]" %
+          [@name, @period, @num_metrics, Config.interval.to_i]
+        page_str = "--- %s/%s ---" % [@page, num_pages]
 
-        # pad until the end of the line so we get the background
-        str += " " * (Curses.cols - str.length)
+        # right align the page number
+        str += "%#{Curses.cols - str.length}s" % page_str
+
         Curses.addstr(str)
       end
     end
